@@ -1,15 +1,25 @@
 ﻿@page "/blog"
+@inject DataContext Context
+@attribute [StreamRendering]
 
 <PageTitle>Blog</PageTitle>
 <h3>Blog</h3>
 
-<div>
-    <p>Article Title</p>
-    <p>Published Date</p>
-    <p>Description</p>
-    <a href="">Read more</a>
-</div>
+@foreach(var post in posts)
+{
+    <div>
+        <p>@post.Title</p>
+        <p>@post.PublisedDate</p>
+        <p>@post.Content</p>
+        <a href="/article/{@post.Id}">Read more</a>
+    </div>
+}
 
 @code {
+    List<BlogPost> posts = new List<BlogPost>();
 
+    protected override async Task OnInitializedAsync()
+    {
+        posts = await Context.BlogPosts.ToListAsync();
+    }
 }
