@@ -1,0 +1,31 @@
+﻿@page "/edit-article"
+@page "/edit-article/{Id:int}"
+@inject DataContext Context
+@attribute [StreamRendering]
+
+@if (Id is null)
+{
+    <PageTitle>Create a New Article</PageTitle>
+    <h3>Create a New Article</h3>
+}
+else
+{
+    <PageTitle>Edit "@post.Title"</PageTitle>
+    <h3>Edit "@post.Title"</h3>
+}
+
+@code {
+    [Parameter]
+    public int? Id { get; set; }
+
+    BlogPost post = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var result = await Context.BlogPosts.FindAsync(Id);
+        if (result is not null)
+        {
+            post = result;
+        }
+    }
+}
