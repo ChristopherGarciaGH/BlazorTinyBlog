@@ -1,0 +1,34 @@
+﻿@page "/article/{Id:int}"
+@inject DataContext Context
+@attribute [StreamRendering]
+
+@if (post is null)
+{
+    <p><em>Loading Blog Posts....</em></p>
+}
+else
+{
+    <PageTitle>@post.Title</PageTitle>
+    <h3>@post.Title</h3>
+
+    <div>
+        <p>@post.PublisedDate</p>
+        <p>@post.Content</p>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    BlogPost? post = null;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var result = await Context.BlogPosts.FindAsync(Id);
+        if(result is not null)
+        {
+            post = result;
+        }
+    }
+}

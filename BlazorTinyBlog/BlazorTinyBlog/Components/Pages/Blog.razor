@@ -5,14 +5,21 @@
 <PageTitle>Blog</PageTitle>
 <h3>Blog</h3>
 
-@foreach(var post in posts)
+@if (posts.Count == 0)
 {
-    <div>
-        <p>@post.Title</p>
-        <p>@post.PublisedDate</p>
-        <p>@post.Content</p>
-        <a href="/article/{@post.Id}">Read more</a>
-    </div>
+    <p><em>Loading Blog Posts....</em></p>
+}
+else
+{
+    @foreach (var post in posts)
+    {
+        <div>
+            <p>@post.Title</p>
+            <p>@post.PublisedDate</p>
+            <p>@post.Content</p>
+            <a href="/article/@post.Id">Read more</a>
+        </div>
+    }
 }
 
 @code {

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlazorTinyBlog.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240921005407_Initial")]
-    partial class Initial
+    [Migration("20240922162356_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
