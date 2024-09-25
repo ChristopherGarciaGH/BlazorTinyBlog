@@ -1,6 +1,7 @@
 ﻿@page "/edit-article"
 @page "/edit-article/{Id:int}"
 @inject DataContext Context
+@inject NavigationManager NavigationManager
 @attribute [StreamRendering]
 
 @if (Id is null)
@@ -42,6 +43,17 @@ else if(Post is not null)
 
 <p>@status</p>
 
+<p>
+    Danger Zone!
+    <br />
+    <form @onsubmit="DeleteArticle" @formname="DeleteArticleForm" method="post">
+        <button class="btn btn-danger">Delete Post</button>
+        <!--La etiqueta AntiforgeryToken mecanismo de seguridad utilizado para prevenir ataques CSRF
+        (Cross-Site Request Forgery, o falsificación de petición en sitios cruzados)-->
+        <AntiforgeryToken></AntiforgeryToken>
+    </form>
+</p>
+
 @code {
     [Parameter]
     public int? Id { get; set; }
@@ -50,14 +62,14 @@ else if(Post is not null)
 
     /*
     * Enlaza la interfaz de nuestro formulario con la logica
-    * del componente
+    * del componente.
     */
     [SupplyParameterFromForm]
     BlogPost? Post { get; set; }
 
     /*
     * Este metodo desencadena el ciclo de vida del componente y carga
-    * los datos relevantes del post en la interfaz
+    * los datos relevantes del post en la interfaz.
     */
     protected override async Task OnParametersSetAsync()
     {
@@ -78,7 +90,7 @@ else if(Post is not null)
     /*
     * Maneja el evento del formulario de edición o creacion
     * hace uso del metodo UpdateArticle() para editar
-    * y CreateArticle() para crear un nuevo post
+    * y CreateArticle() para crear un nuevo post.
     */
     async Task HandleSubmit()
     {
@@ -93,11 +105,11 @@ else if(Post is not null)
     }
 
     /*
-     * Utiliza operaciones asincronas para crear
-     * un nuevo post, utiliza Context.BlogPosts.Add
-     * para crear un nuevo post almacenando el post
-     * del formulario
-     */
+    * Utiliza operaciones asincronas para crear
+    * un nuevo post, utiliza Context.BlogPosts.Add
+    * para crear un nuevo post almacenando el post
+    * del formulario.
+    */
     async Task CreateArticle()
     {
         if(Post is null)
@@ -118,14 +130,14 @@ else if(Post is not null)
     }
 
     /*
-     * Este metodo edita los articulos del blog, utiliza
-     * operaciones asincronas para asegurar que los cambios
-     * se guarden en la base de datos de forma segura y eficiente.
-     * 
-     * Nos traemos de base de datos el post por su id y si la variable
-     * dbArticle no es null y el Post no es null procedemos a actualizar
-     * el post.
-     */
+    * Este metodo edita los articulos del blog, utiliza
+    * operaciones asincronas para asegurar que los cambios
+    * se guarden en la base de datos de forma segura y eficiente.
+    * 
+    * Nos traemos de base de datos el post por su id y si la variable
+    * dbArticle no es null y el Post no es null procedemos a actualizar
+    * el post.
+    */
     async Task UpdateArticle()
     {
         var dbArticle = await Context.BlogPosts.FindAsync(Id);
@@ -147,6 +159,23 @@ else if(Post is not null)
             {
                 status = "Article has NOT been update!";
             }
+        }
+    }
+
+    /*
+     * Este metodo elimina de forma asincrona el post
+     * primeramente buscamos el post por su Id, despues
+     * borramos con .Remove y guardamos en base de datos.
+     */
+    async Task DeleteArticle()
+    {
+        var dbArticle = await Context.BlogPosts.FindAsync(Id);
+
+        if (dbArticle is not null)
+        {
+            Context.BlogPosts.Remove(dbArticle);
+            await Context.SaveChangesAsync();
+            NavigationManager.NavigateTo("/blog");
         }
     }
 }
