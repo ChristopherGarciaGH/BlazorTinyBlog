@@ -49,9 +49,9 @@ else if(Post is not null)
     string status = string.Empty;
 
     /*
-     * Enlaza la interfaz de nuestro formulario con la logica
-     * del componente
-     */
+    * Enlaza la interfaz de nuestro formulario con la logica
+    * del componente
+    */
     [SupplyParameterFromForm]
     BlogPost? Post { get; set; }
 
@@ -76,17 +76,47 @@ else if(Post is not null)
     }
 
     /*
-     * Maneja el evento del formulario de edición, hace
-     * uso del metodo UpdateArticle()
-     */
+    * Maneja el evento del formulario de edición o creacion
+    * hace uso del metodo UpdateArticle() para editar
+    * y CreateArticle() para crear un nuevo post
+    */
     async Task HandleSubmit()
     {
         if(Id is not null)
         {
             await UpdateArticle();
         }
+        else
+        {
+            await CreateArticle();
+        }
     }
-    
+
+    /*
+     * Utiliza operaciones asincronas para crear
+     * un nuevo post, utiliza Context.BlogPosts.Add
+     * para crear un nuevo post almacenando el post
+     * del formulario
+     */
+    async Task CreateArticle()
+    {
+        if(Post is null)
+        {
+            return;
+        }
+        Context.BlogPosts.Add(Post);
+        var result = await Context.SaveChangesAsync();
+
+        if (result == 1)
+        {
+            status = "Article has been created!";
+        }
+        else
+        {
+            status = "Article has NOT been created!";
+        }
+    }
+
     /*
      * Este metodo edita los articulos del blog, utiliza
      * operaciones asincronas para asegurar que los cambios
