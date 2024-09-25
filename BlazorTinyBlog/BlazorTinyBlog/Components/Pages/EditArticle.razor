@@ -8,24 +8,115 @@
     <PageTitle>Create a New Article</PageTitle>
     <h3>Create a New Article</h3>
 }
-else
+else if(Post is not null)
 {
-    <PageTitle>Edit "@post.Title"</PageTitle>
-    <h3>Edit "@post.Title"</h3>
+    <PageTitle>Edit "@Post.Title"</PageTitle>
+    <h3>Edit "@Post.Title"</h3>
 }
+
+@if (Post is not null)
+{
+    <EditForm Model="Post" OnSubmit="HandleSubmit" FormName="ArticleForm">
+        <div>
+            <label for="title">Title</label>
+            <InputText id="title" @bind-Value="Post.Title" class="form-control" />
+        </div>
+
+        <div>
+            <label for="publisedDate">Date</label>
+            <InputDate id="publisedDate" @bind-Value="Post.PublisedDate" class="form-control" />
+        </div>
+
+        <div>
+            <label for="content">Content</label>
+            <InputTextArea id="content" @bind-Value="Post.Content" class="form-control" />
+        </div>
+
+        <div>
+            <InputCheckbox id="isPublished" @bind-Value="Post.IsPublished" class="form-check-input" />
+            <label for="isPublished">Published</label>
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>
+    </EditForm>
+}
+
+<p>@status</p>
 
 @code {
     [Parameter]
     public int? Id { get; set; }
 
-    BlogPost post = new();
+    string status = string.Empty;
 
+    /*
+     * Enlaza la interfaz de nuestro formulario con la logica
+     * del componente
+     */
+    [SupplyParameterFromForm]
+    BlogPost? Post { get; set; }
+
+    /*
+    * Este metodo desencadena el ciclo de vida del componente y carga
+    * los datos relevantes del post en la interfaz
+    */
     protected override async Task OnParametersSetAsync()
     {
-        var result = await Context.BlogPosts.FindAsync(Id);
-        if (result is not null)
+        if (Id is not null)
         {
-            post = result;
+            var result = await Context.BlogPosts.FindAsync(Id);
+            if (result is not null)
+            {
+                Post ??= result;
+            }
+        }
+        else
+        {
+            Post ??= new();
+        }
+    }
+
+    /*
+     * Maneja el evento del formulario de edición, hace
+     * uso del metodo UpdateArticle()
+     */
+    async Task HandleSubmit()
+    {
+        if(Id is not null)
+        {
+            await UpdateArticle();
+        }
+    }
+    
+    /*
+     * Este metodo edita los articulos del blog, utiliza
+     * operaciones asincronas para asegurar que los cambios
+     * se guarden en la base de datos de forma segura y eficiente.
+     * 
+     * Nos traemos de base de datos el post por su id y si la variable
+     * dbArticle no es null y el Post no es null procedemos a actualizar
+     * el post.
+     */
+    async Task UpdateArticle()
+    {
+        var dbArticle = await Context.BlogPosts.FindAsync(Id);
+
+        if(dbArticle is not null && Post is not null)
+        {
+            dbArticle.Title = Post.Title;
+            dbArticle.PublisedDate = Post.PublisedDate;
+            dbArticle.Content = Post.Content;
+            dbArticle.IsPublished = Post.IsPublished;
+
+            var result = await Context.SaveChangesAsync();
+
+            if(result == 1)
+            {
+                status = "Article has been updated!";
+            }
+            else
+            {
+                status = "Article has NOT been update!";
+            }
         }
     }
 }

@@ -27,6 +27,11 @@ else
 @code {
     List<BlogPost> posts = new List<BlogPost>();
 
+    /*
+     * Este metodo inicializa solo una vez para cargar
+     * los datos por primera vez, permite realizar operaciones
+     * que puedan tomar un tiempo de manera no bloqueante
+     */
     protected override async Task OnInitializedAsync()
     {
         posts = await Context.BlogPosts.ToListAsync();

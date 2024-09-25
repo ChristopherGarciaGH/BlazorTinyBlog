@@ -24,6 +24,10 @@ else
 
     BlogPost? post = null;
 
+    /*
+     * Este metodo desencadena el ciclo de vida del componente y carga
+     * los datos relevantes del post en la interfaz
+     */
     protected override async Task OnParametersSetAsync()
     {
         var result = await Context.BlogPosts.FindAsync(Id);
