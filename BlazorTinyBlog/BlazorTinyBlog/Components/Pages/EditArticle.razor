@@ -17,7 +17,7 @@ else if(Post is not null)
 
 @if (Post is not null)
 {
-    <EditForm Model="Post" OnSubmit="HandleSubmit" FormName="ArticleForm">
+    <EditForm Enhance Model="Post" OnSubmit="HandleSubmit" FormName="ArticleForm">
         <div>
             <label for="title">Title</label>
             <InputText id="title" @bind-Value="Post.Title" class="form-control" />
