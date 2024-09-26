@@ -2,7 +2,8 @@
 @page "/edit-article/{Id:int}"
 @inject DataContext Context
 @inject NavigationManager NavigationManager
-@attribute [StreamRendering]
+@* @attribute [StreamRendering] *@
+@rendermode InteractiveServer
 
 @if (Id is null)
 {
@@ -17,7 +18,7 @@ else if(Post is not null)
 
 @if (Post is not null)
 {
-    <EditForm Enhance Model="Post" OnSubmit="HandleSubmit" FormName="ArticleForm">
+    <EditForm Model="Post" OnSubmit="HandleSubmit">
         <div>
             <label for="title">Title</label>
             <InputText id="title" @bind-Value="Post.Title" class="form-control" />
@@ -46,12 +47,10 @@ else if(Post is not null)
 <p>
     Danger Zone!
     <br />
-    <form @onsubmit="DeleteArticle" @formname="DeleteArticleForm" method="post">
-        <button class="btn btn-danger">Delete Post</button>
+        <button class="btn btn-danger" @onclick="DeleteArticle">Delete Post</button>
         <!--La etiqueta AntiforgeryToken mecanismo de seguridad utilizado para prevenir ataques CSRF
         (Cross-Site Request Forgery, o falsificación de petición en sitios cruzados)-->
-        <AntiforgeryToken></AntiforgeryToken>
-    </form>
+        @* <AntiforgeryToken></AntiforgeryToken> *@
 </p>
 
 @code {
@@ -64,7 +63,7 @@ else if(Post is not null)
     * Enlaza la interfaz de nuestro formulario con la logica
     * del componente.
     */
-    [SupplyParameterFromForm]
+    // [SupplyParameterFromForm]
     BlogPost? Post { get; set; }
 
     /*
@@ -78,12 +77,12 @@ else if(Post is not null)
             var result = await Context.BlogPosts.FindAsync(Id);
             if (result is not null)
             {
-                Post ??= result;
+                Post = result;
             }
         }
         else
         {
-            Post ??= new();
+            Post = new();
         }
     }
 
