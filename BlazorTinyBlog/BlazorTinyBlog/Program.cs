@@ -1,6 +1,8 @@
 using BlazorTinyBlog.Client.Pages;
 using BlazorTinyBlog.Components;
 using BlazorTinyBlog.Data;
+using BlazorTinyBlog.Services;
+using BlazorTinyBlog.Shared.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +15,13 @@ builder.Services.AddRazorComponents()
 //Registrar base de datos
 builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped(sp => new HttpClient
+{
+    BaseAddress = new Uri(builder.Configuration.GetSection("BaseUri").Value!),
+});
+
+builder.Services.AddScoped<IBlogPostService, BlogPostService>();
 
 var app = builder.Build();
 
