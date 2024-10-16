@@ -1,5 +1,5 @@
 ﻿@page "/article/{Id:int}"
-@inject DataContext Context
+@inject IBlogPostService BlogPostService
 @attribute [StreamRendering]
 
 @if (post is null)
@@ -30,7 +30,7 @@ else
      */
     protected override async Task OnParametersSetAsync()
     {
-        var result = await Context.BlogPosts.FindAsync(Id);
+        var result = await BlogPostService.GetBlogPostByIdAsync(Id);
         if(result is not null)
         {
             post = result;

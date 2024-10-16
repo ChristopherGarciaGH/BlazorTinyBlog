@@ -1,9 +1,9 @@
 ﻿@page "/edit-article"
 @page "/edit-article/{Id:int}"
-@inject DataContext Context
+@inject IBlogPostService BlogPostService
 @inject NavigationManager NavigationManager
 @* @attribute [StreamRendering] *@
-@rendermode InteractiveServer
+@rendermode InteractiveWebAssembly
 
 @if (Id is null)
 {
@@ -74,7 +74,7 @@ else if(Post is not null)
     {
         if (Id is not null)
         {
-            var result = await Context.BlogPosts.FindAsync(Id);
+            var result = await BlogPostService.GetBlogPostByIdAsync((int)Id);
             if (result is not null)
             {
                 Post = result;
@@ -115,8 +115,8 @@ else if(Post is not null)
         {
             return;
         }
-        Context.BlogPosts.Add(Post);
-        var result = await Context.SaveChangesAsync();
+
+        var result = await BlogPostService.CreateBlogPost(Post);
 
         if (result == 1)
         {
@@ -139,42 +139,37 @@ else if(Post is not null)
     */
     async Task UpdateArticle()
     {
-        var dbArticle = await Context.BlogPosts.FindAsync(Id);
-
-        if(dbArticle is not null && Post is not null)
+        if (Id is null || Post is null)
         {
-            dbArticle.Title = Post.Title;
-            dbArticle.PublisedDate = Post.PublisedDate;
-            dbArticle.Content = Post.Content;
-            dbArticle.IsPublished = Post.IsPublished;
+            status = "Article has NOT been update!";
+            return;
+        }
 
-            var result = await Context.SaveChangesAsync();
+        var result = await BlogPostService.UpdateBlogPost((int)Id, Post);
 
-            if(result == 1)
-            {
-                status = "Article has been updated!";
-            }
-            else
-            {
-                status = "Article has NOT been update!";
-            }
+        if(result == 1)
+        {
+            status = "Article has been updated!";
+        }
+        else
+        {
+            status = "Article has NOT been update!";
         }
     }
 
     /*
-     * Este metodo elimina de forma asincrona el post
-     * primeramente buscamos el post por su Id, despues
-     * borramos con .Remove y guardamos en base de datos.
-     */
+    * Este metodo elimina de forma asincrona el post
+    * primeramente buscamos el post por su Id, despues
+    * borramos con .Remove y guardamos en base de datos.
+    */
     async Task DeleteArticle()
     {
-        var dbArticle = await Context.BlogPosts.FindAsync(Id);
-
-        if (dbArticle is not null)
+        if(Id is null)
         {
-            Context.BlogPosts.Remove(dbArticle);
-            await Context.SaveChangesAsync();
-            NavigationManager.NavigateTo("/blog");
+            return;
         }
+        await BlogPostService.DeleteBlogPost((int)Id);
+            NavigationManager.NavigateTo("/blog");
+
     }
 }

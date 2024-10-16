@@ -1,11 +1,11 @@
 ﻿@page "/blog"
-@inject DataContext Context
+@inject IBlogPostService BlogPostService
 @* @attribute [StreamRendering]*@
 @*El componente solo será visible cuanto esté conectado y listo
     para la interacción del usuario, sin mostrar una versión
     estática antes de que la conexión se establezca.
 *@
-@rendermode @(new InteractiveServerRenderMode(prerender: false))
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
 
 <PageTitle>Blog</PageTitle>
 <h3>Blog</h3>
@@ -32,13 +32,13 @@ else
 @code {
     List<BlogPost> posts = new List<BlogPost>();
 
-    /*
+     /*
      * Este metodo inicializa solo una vez para cargar
      * los datos por primera vez, permite realizar operaciones
      * que puedan tomar un tiempo de manera no bloqueante
-     */
+    */
     protected override async Task OnInitializedAsync()
     {
-        posts = await Context.BlogPosts.ToListAsync();
+        posts = await BlogPostService.GetAllPostAsync();
     }
 }

@@ -1,4 +1,4 @@
-﻿using BlazorTinyBlog.Models;
+﻿using BlazorTinyBlog.Shared.Models;
 using BlazorTinyBlog.Shared.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,7 +6,7 @@ namespace BlazorTinyBlog.Controllers
 {
     [Route("api/[Controller]")]
     [ApiController]
-    public class BlogPostController : Controller
+    public class BlogPostController : ControllerBase
     {
         private readonly IBlogPostService _blogPostService;
 
@@ -44,7 +44,7 @@ namespace BlazorTinyBlog.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<int>> DeleteeBlogPostAsync(int id)
+        public async Task<ActionResult<int>> DeleteBlogPostAsync(int id)
         {
             var result = await _blogPostService.DeleteBlogPost(id);
             return (result);
